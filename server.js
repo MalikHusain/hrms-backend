@@ -64,9 +64,9 @@ app.post("/api/auth/register", async (req, res) => {
 
 // POST /api/auth/login  ── must compare against encrypted email in DB
 app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password)
-    return res.status(400).json({ error: "email and password are required" });
+  const { email, employee_id, password } = req.body;
+if ((!email && !employee_id) || !password)
+  return res.status(400).json({ error: "credentials and password are required" });
 
   try {
     // Fetch all users and find the one whose decrypted email matches
@@ -76,9 +76,11 @@ app.post("/api/auth/login", async (req, res) => {
     );
 
     const user = all.rows.find(u => {
-      try { return decrypt(u.email) === email; } catch { return false; }
-    });
-
+  try {
+    if (employee_id) return u.employee_id === employee_id;
+    return decrypt(u.email) === email;
+  } catch { return false; }
+});
     if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
     const valid = await bcrypt.compare(password, user.password);
