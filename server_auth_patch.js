@@ -1,22 +1,12 @@
-import express  from "express";
-import cors     from "cors";
-import bcrypt   from "bcryptjs";
-import jwt      from "jsonwebtoken";
-import dotenv   from "dotenv";
-import pool     from "./db.js";                          // ← pool lives here now
-import attendanceRoutes from "./routes/attendance.js";
-import candidateRoutes from "./routes/candidates.js";
-import { encrypt, decrypt } from "./utils/crypto.js";
-
-dotenv.config();
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/candidates", candidateRoutes);
-app.use("/uploads", express.static("uploads"));
+// ─────────────────────────────────────────────────────────────────────────────
+// server.js AUTH ROUTE PATCHES  
+// Add this import near the top of server.js (with other imports):
+//
+//   import { encrypt, decrypt } from "./utils/crypto.js";
+//
+// Then replace your existing /api/auth/register and /api/auth/login routes
+// with these patched versions:
+// ─────────────────────────────────────────────────────────────────────────────
 
 // POST /api/auth/register  ── encrypts email + phone before storing
 app.post("/api/auth/register", async (req, res) => {
@@ -111,10 +101,4 @@ app.post("/api/auth/login", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
-}); 
-
-/* ================= START SERVER ================= */
-
-app.listen(5000, () =>
-  console.log("Server running on http://localhost:5000")
-);
+});
